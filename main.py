@@ -6,6 +6,9 @@ import random
 
 pygame.init()
 
+clock = pygame.time.Clock()
+FPS = 30
+
 pygame.display.set_caption("FlappyBird")
 
 SCREEN_HEIGHT = 800
@@ -99,11 +102,13 @@ def main():
 
     run = True
     while run:
+        clock.tick(FPS)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
+        bird.move()
         draw_screen(screen, bird)
 
     pygame.quit()
