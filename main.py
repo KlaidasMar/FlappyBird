@@ -9,16 +9,16 @@ pygame.init()
 pygame.display.set_caption("FlappyBird")
 
 SCREEN_HEIGHT = 800
-SCREEN_WIDTH = 600
+SCREEN_WIDTH = 500
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird1.png"))),
-             pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird2.png"))),
-             pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird3.png")))]
+BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("Assets", "imgs", "bird1.png"))),
+             pygame.transform.scale2x(pygame.image.load(os.path.join("Assets", "imgs", "bird2.png"))),
+             pygame.transform.scale2x(pygame.image.load(os.path.join("Assets", "imgs", "bird3.png")))]
 PIPE_IMG = pygame.image.load('Assets/imgs/pipe.png')
 BASE_IMG = pygame.image.load('Assets/imgs/base.png')
-BG_IMG = pygame.image.load('Assets/imgs/bg.png')
+BG_IMG = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "imgs","bg.png")).convert_alpha(), (500, 800))
 
 class Bird:
     IMGS = BIRD_IMGS
@@ -71,21 +71,42 @@ class Bird:
         elif self.image_count < self.ANIMATION_TIME * 3:
             self.img = self.IMGS[2]
         elif self.image_count < self.ANIMATION_TIME * 4:
-            self.img = self.IMGS[3]
+            self.img = self.IMGS[1]
         elif self.image_count == self.ANIMATION_TIME * 4 + 1:
             self.img = self.IMGS[0]
             self.image_count = 0
 
+        if self.tilt <= -80:
+            self.img = self.IMGS[1]
+            self.image_count = self.ANIMATION_TIME * 2
+
+        rotated_image = pygame.transform.rotate(self.img, self.tilt)
+        new_rect = rotated_image.get_rect(center=self.img.get_rect(topleft=(self.x, self.y)).center)
+        screen.blit(rotated_image, new_rect.topleft)
+
+    def get_mask(self):
+        return pygame.mask.from_surface(self.img)
 
 
-run = True
-while run:
-
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-
+def draw_screen(screen, bird):
+    screen.blit(BG_IMG, (0, 0))
+    bird.draw(screen)
     pygame.display.update()
 
-pygame.quit()
+
+def main():
+    bird = Bird(200, 200)
+
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        draw_screen(screen, bird)
+
+    pygame.quit()
+    quit()
+
+main()
